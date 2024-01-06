@@ -6,6 +6,10 @@ TagManager:
   tags:
   - FerrisStopDestination
   - Button
+  - PlayerEyes
+  - Lift
+  - Branch
+  - MovableItem
   layers:
   - Default
   - TransparentFX
