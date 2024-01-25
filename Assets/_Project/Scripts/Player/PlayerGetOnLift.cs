@@ -6,7 +6,6 @@ public class PlayerGetOnLift : MonoBehaviour
     {
         if(col.gameObject.CompareTag(TagManager.Lift))
         {
-            print("collide");
             transform.parent = col.gameObject.transform.parent;
         }    
     }
@@ -15,7 +14,6 @@ public class PlayerGetOnLift : MonoBehaviour
     {
         if(col.gameObject.CompareTag(TagManager.Lift))
         {
-            print("exit");
             transform.parent = null;
         }    
     }

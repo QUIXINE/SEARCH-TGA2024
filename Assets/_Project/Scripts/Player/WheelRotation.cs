@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class WheelRotation : MonoBehaviour
 {
-    [SerializeField] private float rotateAngle;
+    [Tooltip("angle size to rotate, or speed to rotate, and direction of rotation (+ and -)")]
+    [FormerlySerializedAs("rotateAngle")] [SerializeField] private float _rotateAngle;
     void Update()
     {
-        transform.Rotate(0, 0, rotateAngle * Time.deltaTime);
+        transform.Rotate(0, 0, _rotateAngle * Time.deltaTime);
     }
 
     //Try use delegate to store function of cabin and wheel rotation, and put these logic in another class to use it to stop rotation at the same time

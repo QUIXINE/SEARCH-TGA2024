@@ -609,15 +609,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b736b9c74d52c4043a6165c562ae61a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stopRotationTime: 0
-  nextStopRotationTime: 0
-  raycastTransform: {fileID: 1394801415794744955}
-  raycastDistance: 3
-  groundLayer:
+  _stopRotationTimeDefault: 6
+  _stopRotationTime: 0
+  _nextStopRotationTimeDefault: 5
+  _nextStopRotationTime: 0
+  _getDownRotation: 0
+  _getUpRotation: -90
+  _raycastTransform: {fileID: 1394801415794744955}
+  _raycastDistance: 3
+  _groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  wheel: {fileID: 0}
-  wheel_Rotation: {fileID: 0}
+  _wheel: {fileID: 0}
+  _wheelRotation: {fileID: 0}
+  _floorRotateSpeed: 3
+  _dividingTime: 4
 --- !u!1 &8245732569014302954
 GameObject:
   m_ObjectHideFlags: 0

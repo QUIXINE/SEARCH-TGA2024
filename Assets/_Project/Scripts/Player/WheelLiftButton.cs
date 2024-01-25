@@ -1,10 +1,15 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class WheelLiftButton : MonoBehaviour, IButton
 {
-    [SerializeField] private GameObject wheel;
-    [SerializeField] private float speed;
-    [SerializeField] private Vector3 downPosition, upPosition;
+    [SerializeField] private GameObject _wheel;
+    [FormerlySerializedAs("_speed")] [SerializeField] private float _moveSpeed;
+    [SerializeField] private Vector3 _downPosition;
+    [SerializeField] private Vector3 _upPosition;
+    
+    [Tooltip("define where the lift will move to on y-axis")]
+    [SerializeField] private float _yPos;
     private bool _isWheelAbleToMove;
     private Vector3 _targetPosition;
 
@@ -16,11 +21,11 @@ public class WheelLiftButton : MonoBehaviour, IButton
 
     private void AssignObjectToMove()
     {
-        if(wheel != null)
+        if(_wheel != null)
         {
-            downPosition = new Vector3(wheel.transform.position.x, 20.26f, wheel.transform.position.z);
-            upPosition = new Vector3(wheel.transform.position.x, wheel.transform.position.y, wheel.transform.position.z);
-            _targetPosition = downPosition;
+            _downPosition = new Vector3(_wheel.transform.localPosition.x, _yPos, _wheel.transform.localPosition.z);
+            _upPosition = new Vector3(_wheel.transform.localPosition.x, _wheel.transform.localPosition.y, _wheel.transform.localPosition.z);
+            _targetPosition = _downPosition;
         }
     }
 
@@ -35,10 +40,10 @@ public class WheelLiftButton : MonoBehaviour, IButton
         //How can I code to not let this condition always true
        if(_isWheelAbleToMove)
         {
-            wheel.transform.position = Vector3.MoveTowards(wheel.transform.position ,  _targetPosition, speed * Time.deltaTime);
+            _wheel.transform.localPosition = Vector3.MoveTowards(_wheel.transform.localPosition ,  _targetPosition, _moveSpeed * Time.deltaTime);
             
             //check if wheel is at target position then set isWheelAbleToMove = false to stop checking
-            if(wheel.transform.position.y == _targetPosition.y)
+            if(_wheel.transform.position.y == _targetPosition.y)
             {
                 _isWheelAbleToMove = false;
             }
@@ -48,22 +53,22 @@ public class WheelLiftButton : MonoBehaviour, IButton
     public void Execute()
     {
         //assign target position
-        if(wheel.transform.position == upPosition)
+        if(_wheel.transform.position == _upPosition)
         {
-            _targetPosition = downPosition;
+            _targetPosition = _downPosition;
         }
-        else if(wheel.transform.position != upPosition && _targetPosition == downPosition)
+        else if(_wheel.transform.position != _upPosition && _targetPosition == _downPosition)
         {
-            _targetPosition = upPosition;
+            _targetPosition = _upPosition;
         }
-        else if(wheel.transform.position == downPosition)
+        else if(_wheel.transform.position == _downPosition)
         {
 
-            _targetPosition = upPosition;
+            _targetPosition = _upPosition;
         }
-        else if(wheel.transform.position != downPosition && _targetPosition == upPosition)
+        else if(_wheel.transform.position != _downPosition && _targetPosition == _upPosition)
         {
-            _targetPosition = downPosition;
+            _targetPosition = _downPosition;
         }
         
         if(!_isWheelAbleToMove)
