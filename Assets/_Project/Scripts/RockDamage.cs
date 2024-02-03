@@ -10,8 +10,6 @@ public class RockDamage : MonoBehaviour
     {
         if (col.gameObject.TryGetComponent<PlayerTakeDamage>(out PlayerTakeDamage playerTakeDamage) && !IsPlayerInSafeSpot)
         {
-            PlayerController playerController = playerTakeDamage.gameObject.GetComponent<PlayerController>();
-            playerController.enabled = false;
             playerTakeDamage.TakeDamage();
         }
     }
