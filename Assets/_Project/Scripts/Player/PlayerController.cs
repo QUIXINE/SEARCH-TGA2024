@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform _movableObjDetectorLeft, _movableObjDetectorRight;
     [SerializeField] private Transform _movableObjParent;
     [SerializeField] private float _detectorRayDistance;
+    private GameObject _grabbedObj;
     private bool _isNearMovableObject;
     private bool _isGrabbing;
     private Vector3 _playerYPos;
@@ -18,11 +20,13 @@ public class PlayerController : MonoBehaviour
     //Slide Check
     [Header("Slide Check")]
     [SerializeField] private Transform _groundDetector;
+    [SerializeField] private Transform _slidingDestinationPoint;
     [SerializeField] private float _groundDetectorRayDistance;
     [SerializeField] private float _slidingSpeedX;
     [SerializeField] private float _slidingSpeedY;
     [SerializeField] private float _slopeLimit;
     [SerializeField] private float _ySpeed;
+    [SerializeField] private float _slideSpeed;
     private Vector3 _slopeSlideVelocity;
     private bool _isSlideOff;
     private bool _isSliding;
@@ -41,7 +45,6 @@ public class PlayerController : MonoBehaviour
     [Header("Ground Check")]
     [SerializeField] private LayerMask _groundLayerMask;
     
-
     
     void Start()
     {
@@ -91,20 +94,36 @@ public class PlayerController : MonoBehaviour
         _isNearMovableObject = Physics.Raycast(_movableObjDetectorLeft.position, Vector3.left, out hit,_detectorRayDistance) || Physics.Raycast(_movableObjDetectorLeft.position, Vector3.right, out hit,_detectorRayDistance)
                                || Physics.Raycast(_movableObjDetectorRight.position, Vector3.right, out hit,_detectorRayDistance)|| Physics.Raycast(_movableObjDetectorRight.position, Vector3.left, out hit,_detectorRayDistance)? true : false;
        
-        print(_isNearMovableObject);
-        if (!_isGrabbing &&_isNearMovableObject && hit.collider.CompareTag(TagManager.MovableItem) && Input.GetKey(KeyCode.RightControl))
+        if (!_isGrabbing &&_isNearMovableObject && hit.collider.CompareTag(TagManager.MovableItem) && Input.GetKey(KeyCode.LeftControl))
         {
             _rb.constraints |= RigidbodyConstraints.FreezePositionY;
             //hit.collider.transform.parent.parent = _movableObjParent; --> original, has no if-else under
-            if(hit.collider.transform.parent) //use w/ bear trap or other objs that have parent
+            if (hit.collider.gameObject.TryGetComponent<Rigidbody>(out Rigidbody rb) 
+                     && hit.collider.gameObject.TryGetComponent<MovableObjectCheckMoving>(out MovableObjectCheckMoving movableObj))
+            {
+                //used to set kinematic of the box because if kinematic is false the box won't be able to be moved by player
+                print("grab obj with IsMoving");
+                rb.isKinematic = true;
+                movableObj.IsMoving = false;
+                hit.collider.transform.parent = _movableObjParent;
+            }
+            else if (hit.collider.gameObject.TryGetComponent<Rigidbody>(out Rigidbody rb2))
+            {
+                //used to set kinematic of the box because if kinematic is false the box won't be able to be moved by player
+                print("grab obj with Rigidbody");
+                rb2.isKinematic = true;
+                _grabbedObj = hit.collider.gameObject;
+                hit.collider.transform.parent = _movableObjParent;
+            }
+            else if(hit.collider.transform.parent) //use w/ bear trap or other objs that have parent
             {
                 hit.collider.transform.parent.parent = _movableObjParent;
                 print("grab parent");
             }
             else
             {
-                hit.collider.transform.parent = _movableObjParent;
                 print("grab obj");
+                hit.collider.transform.parent = _movableObjParent;
             }
 
             _isGrabbing = true;
@@ -112,12 +131,34 @@ public class PlayerController : MonoBehaviour
             // hit.collider.transform.parent.transform.position = newPos;
 
         }
-        else if(Input.GetKeyUp(KeyCode.RightControl))
+        else if(Input.GetKeyUp(KeyCode.LeftControl))
         {
+            if (_isNearMovableObject && hit.collider.CompareTag(TagManager.MovableItem) && hit.collider.gameObject.TryGetComponent<Rigidbody>(out Rigidbody rb) 
+                && hit.collider.gameObject.TryGetComponent<MovableObjectCheckMoving>(out MovableObjectCheckMoving movableObj))
+            {
+                print("release box");
+                movableObj.IsMoving = true;
+                rb.isKinematic = false;
+            }
+            else if (_isNearMovableObject && hit.collider.CompareTag(TagManager.MovableItem) && hit.collider.gameObject.TryGetComponent<Rigidbody>(out Rigidbody rb2))
+            {
+                print("release box with Rigidbody");
+                _grabbedObj = null;
+                rb2.isKinematic = false;
+            }
+            else if (_grabbedObj != null && _grabbedObj.TryGetComponent<Rigidbody>(out Rigidbody rb3))
+            {
+                rb3.isKinematic = false;
+                _grabbedObj = null;
+            }
             _rb.constraints &= ~RigidbodyConstraints.FreezePositionY;
             _movableObjParent.DetachChildren();     //Detach all children inside this parent
             _isGrabbing = false;
-            print("release 1");
+        }
+
+        if (!IsOnGround)
+        {
+            _rb.constraints &= ~RigidbodyConstraints.FreezePositionY;
         }
         /*else
         {
@@ -139,9 +180,18 @@ public class PlayerController : MonoBehaviour
                 {
                     _horizontalInput = 1;
                 }
-                _rb.velocity = new Vector3(/*_rb.velocity.x + */0, /*_rb.velocity.y + */_slidingSpeedY, _slidingSpeedX);
+
+                _isSliding = true;
+
+                //_rb.velocity = new Vector3(/*_rb.velocity.x + */0, /*_rb.velocity.y + */_slidingSpeedY, _slidingSpeedX);
             }
             
+        }
+        
+
+        if (_isSliding && !_isSlideOff)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, _slidingDestinationPoint.position, _slideSpeed * Time.deltaTime);
         }
         
         /*if (_isSlideOff)
@@ -234,6 +284,7 @@ public class PlayerController : MonoBehaviour
             IsOnGround = false;
         }
     }
+
      
     private void OnCollisionEnter(Collision other)
     {
@@ -252,5 +303,4 @@ public class PlayerController : MonoBehaviour
             _isSlideOff = true;
         }
     }
-    
 }

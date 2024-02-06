@@ -7,6 +7,5 @@ public class PlayerTakeDamage : MonoBehaviour
         var playerController = GetComponent<PlayerController>();
         playerController.enabled = false;
         enabled = false;
-        print("Take damage");
     }
 }

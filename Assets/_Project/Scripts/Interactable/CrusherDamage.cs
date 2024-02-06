@@ -1,8 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class CrusherDamage : MonoBehaviour
 {
@@ -30,12 +26,23 @@ public class CrusherDamage : MonoBehaviour
             //can't use IsOnGround because if player jump while being crushed, then the condition won't be met
             if(playerController.IsOnGround && _dot > 1 + _dotOffset)
             {
-                print("Collide");
                 Rigidbody playerRb = playerTakeDamage.gameObject.GetComponent<Rigidbody>();
                 playerRb.isKinematic = true;
                 Collider playerCollider = playerTakeDamage.gameObject.GetComponent<CapsuleCollider>();
                 playerCollider.enabled = false;
                 playerTakeDamage.TakeDamage();
+            }
+            else if(_playerController.gameObject.TryGetComponent<CrusherCheck>(out CrusherCheck crusherCheck) && _dot > -1 + _dotOffset)
+            {
+                if (crusherCheck.IsCrusherOnHead)
+                {
+                    //check when the crusher crushes from downside
+                    Rigidbody playerRb = playerTakeDamage.gameObject.GetComponent<Rigidbody>();
+                    playerRb.isKinematic = true;
+                    Collider playerCollider = playerTakeDamage.gameObject.GetComponent<CapsuleCollider>();
+                    playerCollider.enabled = false;
+                    playerTakeDamage.TakeDamage();
+                }
             }
         }
     }
@@ -49,7 +56,6 @@ public class CrusherDamage : MonoBehaviour
             //can't use IsOnGround because if player jump while being crushed, then the condition won't be met
             if(playerController.IsOnGround && _dot > 1 + _dotOffset)
             {
-                print("Collide");
                 Rigidbody playerRb = playerTakeDamage.gameObject.GetComponent<Rigidbody>();
                 playerRb.isKinematic = true;
                 Collider playerCollider = playerTakeDamage.gameObject.GetComponent<CapsuleCollider>();
@@ -58,4 +64,6 @@ public class CrusherDamage : MonoBehaviour
             }
         }
     }
+    
+    //the down crusher is moving to the top, and player is stuck between 2 floor(crusher) which makes player isn't on ground while being crushed when 2 floor crash
 }

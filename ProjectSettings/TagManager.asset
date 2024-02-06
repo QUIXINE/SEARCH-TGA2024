@@ -10,6 +10,8 @@ TagManager:
   - Lift
   - Branch
   - MovableItem
+  - Woods
+  - Crusher
   layers:
   - Default
   - TransparentFX

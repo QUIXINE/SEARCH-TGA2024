@@ -3,21 +3,29 @@ using UnityEngine.Serialization;
 
 public class WoodClamp : MonoBehaviour
 {
+    [Header("Circle Checker Setup")]
     [SerializeField] private float _outerCircleRadius, _innerCircleRadius;
     [SerializeField] private float _outerCircleDistance, _innerCircleDistance;
     [SerializeField] private FirePitOpenClose[] _firePitOpenClose;
-    [FormerlySerializedAs("_timeTocloaseFirePit")]
     [Tooltip("close fire pit after Wait To Move Left Time reach to this")]
     [SerializeField] private float _timeToCloseFirePit;
-    [Tooltip("Effector")]
+    
+    [Header("Animation Rigging Effector")]
     [SerializeField] private Transform _target;
+    
+    [Header("Effector Position Setting")]
     [SerializeField] private Vector3 _targetStartPosition;
     [SerializeField] private Vector3 _targetStraightPosition;
-    [SerializeField] private Vector3 _clampStartPosition;
-    [SerializeField] private Vector3 _clampGetUpPosition;
-    [SerializeField] private Vector3 _clampGetUpPositionForPlayer;
-    [SerializeField] private Vector3 _clampGetRightPosition;
+    
+    [Header("Clamp Position Setting")]
+    private Vector3 _clampStartPosition;
+    private Vector3 _clampGetUpPosition;
+    [Tooltip("Clamp Get Up Position For Player will move lower than Clamp Get Up Position")]
+    private Vector3 _clampGetUpPositionForPlayer;
+    private Vector3 _clampGetRightPosition;
+    [Tooltip("Clamp moving speed")]
     [SerializeField] private float _maxDistanceDelta;
+    [Tooltip("Clamp grabbing speed when found player")]
     [SerializeField] private float _grabSpeed;
     [SerializeField] private float _waitToMoveDownTime;
     [SerializeField] private float _waitToMoveLeftTime;
@@ -56,7 +64,7 @@ public class WoodClamp : MonoBehaviour
 
     private void IsObjInOuterCircle()
     {
-        bool isHit = Physics.SphereCast(transform.position, _outerCircleRadius, Vector3.up, out RaycastHit hitInfo,
+        bool isHit = Physics.SphereCast(transform.position, _outerCircleRadius, Vector3.down, out RaycastHit hitInfo,
             _outerCircleDistance);
         if (isHit && hitInfo.collider.gameObject.CompareTag(TagManager.MovableItem))
         {
