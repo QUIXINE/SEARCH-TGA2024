@@ -9,7 +9,7 @@ public class StopRockDamage : MonoBehaviour
 
     private void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.CompareTag("Player"))
+        if (col.gameObject.CompareTag(TagManager.Player))
         {
             print("Stop Damaging");
             _rockDamage.IsPlayerInSafeSpot = true;
@@ -18,7 +18,7 @@ public class StopRockDamage : MonoBehaviour
 
     private void OnTriggerExit(Collider col)
     {
-        if (col.gameObject.CompareTag("Player") && !_isCollidedWithRock)
+        if (col.gameObject.CompareTag(TagManager.Player) && !_isCollidedWithRock)
         {
             _rockDamage.IsPlayerInSafeSpot = false;
         }

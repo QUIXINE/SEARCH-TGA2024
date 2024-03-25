@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -5,9 +6,13 @@ public class WormController : MonoBehaviour
 {
 
 
-    [FormerlySerializedAs("_target")] [Header("Animation Rigging Effector")] [SerializeField]
-    private Transform _effector;
+    [Header("Animation Rigging Effector")]
+    [SerializeField] private Transform _effector;
 
+    [Header("Animation")] 
+    [SerializeField] private Animator _animator;
+    private int _attackAnimId = Animator.StringToHash("Attack");
+    
     [Header("Box Checker Setup")]
     [SerializeField] private Transform _boxCenter;
     [SerializeField] private Vector3 _halfExtents;
@@ -31,20 +36,24 @@ public class WormController : MonoBehaviour
     private bool _isUp;
     private bool _isDown;
 
-    [FormerlySerializedAs("_player")]
     [Header("Player/Food")] 
+    //Use FindGameObj instead of dragging in
     [SerializeField] private Transform _playerTransform;
     [SerializeField] private float _playerYPos;
     [SerializeField] private GameObject _player;
-    
+    private bool _isHit;
+    // private RaycastHit hitInfo;
     void Start()
     {
-        _startPosition = transform.root.position;
-        _moveUpPosition = new Vector3(transform.root.position.x, transform.root.position.y + _moveUpDistanceY,
-            transform.root.position.z);
+        _startPosition = transform.position;
+        _moveUpPosition = new Vector3(transform.position.x, transform.position.y + _moveUpDistanceY,
+            transform.position.z);
         _waitToMoveDownTimeDecreased = _waitToMoveDownTime;
         _waitToMoveUpTimeDecreased = _waitToMoveUpTime;
         _isUp = true;
+        var player = FindObjectOfType<PlayerController>();
+        _playerTransform = player.transform;
+        _animator = GetComponentInChildren<Animator>();
     }
 
     // Update is called once per frame
@@ -54,63 +63,71 @@ public class WormController : MonoBehaviour
         Movement();
     }
 
+    private void FixedUpdate()
+    {
+        // _isHit = Physics.BoxCast(_boxCenter.position, _halfExtents, Vector3.up, out hitInfo,
+        //     Quaternion.identity, _maxDistance);
+    }
+
     private void Movement()
     {
-        bool isHit = Physics.BoxCast(_boxCenter.position, _halfExtents, Vector3.up, out RaycastHit hitInfo,
-            Quaternion.identity, _maxDistance);
+        //if player in range (detected by boxcast), then move worm rapidly towards player.
+        //if worm is closer to player (if detected by boxcast and distance between player and head is close), moves effector to player
+        // bool isHit = Physics.BoxCast(_boxCenter.position, _halfExtents, Vector3.up, out RaycastHit hitInfo,
+        //     Quaternion.identity, _maxDistance);
 
-        if (isHit)
+        if (!_isHit && _player == null)
         {
-            _player = hitInfo.collider.gameObject;
+            if (_isUp)
+            {
+                MoveUp(_isHit);
+            }
+            else if (_isDown)
+            {
+                MoveDown(_isHit);
+            }
         }
-        else if (_player != null)
+        else if (_player == _playerTransform.gameObject)
         {
-            print($"isHit : {isHit}");
+            _player.GetComponent<PlayerController>().HorizontalInput = 0;
             _player.GetComponent<PlayerController>().enabled = false;
             _player.GetComponent<Rigidbody>().isKinematic = true;
             _player.GetComponent<Rigidbody>().useGravity = false;
             if (_isUp)
             {
-                transform.root.position = Vector3.MoveTowards(transform.root.position, 
-                    new Vector3(_playerTransform.position.x, _playerTransform.position.y + _playerYPos, _playerTransform.position.z), _biteSpeed * Time.deltaTime);
-                if (Vector3.Distance(transform.root.position, _playerTransform.position) <= 1f)
+                var pos = new Vector3(transform.position.x, _playerTransform.position.y + _playerYPos,
+                    transform.position.z);
+                transform.position = Vector3.MoveTowards(transform.position, 
+                    pos, _biteSpeed * Time.deltaTime);
+                if (Vector3.Distance(transform.position, pos) <= 0.01f)
                 {
                     MoveEffector();
                 }
             }
             else if (_isDown)
             {
-                transform.root.position = Vector3.MoveTowards(transform.root.position, 
-                    new Vector3(_playerTransform.position.x, _playerTransform.position.y + _playerYPos, _playerTransform.position.z), _biteSpeed * Time.deltaTime);
-                if (Vector3.Distance(transform.root.position, _playerTransform.position) <= 1f)
+                var pos = new Vector3(transform.position.x, _playerTransform.position.y + _playerYPos,
+                    transform.position.z);
+                transform.position = Vector3.MoveTowards(transform.position, 
+                    pos, _biteSpeed * Time.deltaTime);
+                if (Vector3.Distance(transform.position, pos) <= 0.01f)
                 {
                     MoveEffector();
                 }
             }
         }
-        else if (!isHit && _player == null)
-        {
-            print($"isHit : {isHit}");
-            if (_isUp)
-            {
-                MoveUp(isHit, hitInfo);
-            }
-            else if (_isDown)
-            {
-                MoveDown(isHit, hitInfo);
-            }
-        }
+        
     }
 
     
-    private void MoveUp(bool isHit, RaycastHit hitInfo)
+    private void MoveUp(bool isHit)
     {
         //_target.localPosition = Vector3.MoveTowards(_target.localPosition, _targetStraightPosition, _maxDistanceDelta * Time.deltaTime);
         if (!isHit)
         {
-            transform.root.position = Vector3.MoveTowards(transform.root.position, _moveUpPosition, _maxDistanceDelta * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, _moveUpPosition, _maxDistanceDelta * Time.deltaTime);
             //wait to get back
-            if (Vector3.Distance(transform.root.position, _moveUpPosition) <= 0.01f)
+            if (Vector3.Distance(transform.position, _moveUpPosition) <= 0.01f)
             {
                 _waitToMoveDownTimeDecreased -= Time.deltaTime;
                 if (_waitToMoveDownTimeDecreased <= 0)
@@ -122,25 +139,15 @@ public class WormController : MonoBehaviour
                 }
             }
         }
-        /*else if (isHit)
-        {
-            /*transform.root.position = Vector3.MoveTowards(transform.root.position, _player.position, _maxDistanceDelta * Time.deltaTime);
-            if (Vector3.Distance(transform.root.position, _moveUpPosition) <= 1f)
-            {
-                MoveEffector();
-            }#1#
-        }*/
-        //if player in range (detected by boxcast), then move worm rapidly towards player.
-        //if worm is closer to player (if detected by boxcast and distance between player and head is close), moves effector to player
 
     }
     
-    private void MoveDown(bool isHit, RaycastHit hitInfo)
+    private void MoveDown(bool isHit)
     {
         if (!isHit)
         {
-            transform.root.position = Vector3.MoveTowards(transform.root.position, _startPosition, _maxDistanceDelta * Time.deltaTime);
-            if (Vector3.Distance(transform.root.position, _startPosition) <= 0.01f)
+            transform.position = Vector3.MoveTowards(transform.position, _startPosition, _maxDistanceDelta * Time.deltaTime);
+            if (Vector3.Distance(transform.position, _startPosition) <= 0.01f)
             {
                 _waitToMoveDownTimeDecreased -= Time.deltaTime;
                 if (_waitToMoveDownTimeDecreased <= 0)
@@ -152,16 +159,6 @@ public class WormController : MonoBehaviour
                 }
             }
         }
-        /*else if (isHit)
-        {
-            transform.root.position = Vector3.MoveTowards(transform.root.position, _player.position, _maxDistanceDelta * Time.deltaTime);
-            if (Vector3.Distance(transform.root.position, _player.position) <= 1f)
-            {
-                MoveEffector();
-            }
-        }*/
-        //if player in range (detected by boxcast), then move worm rapidly towards player.
-        //if worm is closer to player (if detected by boxcast and distance between player and head is close), moves effector to player
     }
 
    
@@ -170,6 +167,24 @@ public class WormController : MonoBehaviour
     {
         _effector.gameObject.transform.position =
             Vector3.MoveTowards(_effector.position, _playerTransform.position, _biteSpeed * Time.deltaTime);
+        if (Vector3.Distance(_effector.position, _playerTransform.position) <= 0.01f && !_animator.GetBool(_attackAnimId))
+        {
+            var takeDamage = _player.GetComponent<PlayerTakeDamage>();
+            takeDamage.TakeDamage(gameObject.scene);
+            _animator.SetBool(_attackAnimId, true);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag(TagManager.Player))
+        {
+            _isHit = true;
+            if (_player == null)
+            {
+                _player = other.gameObject;
+            }
+        }
     }
 
     private void OnDrawGizmos()

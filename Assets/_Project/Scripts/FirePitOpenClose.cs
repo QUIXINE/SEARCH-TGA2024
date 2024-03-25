@@ -32,7 +32,7 @@ public class FirePitOpenClose : MonoBehaviour
             {
                 transform.localPosition =
                     Vector3.MoveTowards(transform.localPosition, _targetPosition, _closeSpeed * Time.deltaTime);
-                if (Vector3.Distance(transform.position, _targetPosition) <= 0.001f)
+                if (Vector3.Distance(transform.localPosition, _targetPosition) <= 0.001f)
                 {
                     _targetPosition = _startPosition;
                     /*_recoveryTime -= Time.deltaTime;
@@ -46,7 +46,7 @@ public class FirePitOpenClose : MonoBehaviour
             {
                 transform.localPosition =
                     Vector3.MoveTowards(transform.localPosition, _targetPosition, _openSpeed * Time.deltaTime);
-                if (Vector3.Distance(transform.position, _targetPosition) <= 0.001f)
+                if (Vector3.Distance(transform.localPosition, _targetPosition) <= 0.001f)
                 {
                     //_crushNextTime = _crushNextTimeDefault;
                     _targetPosition = _endPosition;

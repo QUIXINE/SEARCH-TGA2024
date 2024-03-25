@@ -8,8 +8,7 @@ public class CrusherController : MonoBehaviour
 {
     [Tooltip("used to assign Crush Next Time back to desired value")]
     [SerializeField] private float _crushNextTimeDefault;
-    [Tooltip("indicate how long the crusher will wait to repeat the action")]
-    [SerializeField] private float _crushNextTime;
+    [SerializeField] private float _crushNextTime;  // indicate how long the crusher will wait to repeat the action
 
     [SerializeField] private Vector3 _startPosition;
     [Tooltip("manually set y-axis to tell where crusher need to go")]
@@ -19,7 +18,7 @@ public class CrusherController : MonoBehaviour
     [SerializeField] private float _getDownSpeed;
     [SerializeField] private float _getUpSpeed;
     [SerializeField] private float _recoveryTimeDefault;
-    [SerializeField] private float _recoveryTime;
+    private float _recoveryTime;    // indicate how long the crusher will wait to repeat the action
     private Vector3 _targetPosition;
 
     private void Start()
@@ -38,7 +37,10 @@ public class CrusherController : MonoBehaviour
 
     void Crush()
     {
-        _crushNextTime -= Time.deltaTime;
+        if (transform.position == _startPosition)
+        {
+            _crushNextTime -= Time.deltaTime;
+        }
         
         if(_crushNextTime <= 0 && _recoveryTime >= 0)
         {

@@ -12,7 +12,7 @@ public class ShaperButton : MonoBehaviour, IButton
     [SerializeField] private float _yPos;
     [Tooltip("Shaper Door's speed of movement")]
     [SerializeField] private float _maxDistanceDelta;
-    [Tooltip("Shaper Door's speed of movement")]
+    [Tooltip("Shaper Door's open time")]
     [SerializeField] private float _doorOpenTime;
     private float _doorOpenTimeDecreased;
     private Vector3 _startPosition, _endPosition, _targetPosition;
@@ -68,6 +68,7 @@ public class ShaperButton : MonoBehaviour, IButton
     {
         if(IsWoodReady)
         {
+            print("pushed");
             IsWoodReady = false;
             _woodShaperButtonRdr.material.DisableKeyword("_EMISSION");
             _shaperRedLightRdr.material.DisableKeyword("_EMISSION");

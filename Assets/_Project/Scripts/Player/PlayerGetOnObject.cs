@@ -24,10 +24,10 @@ public class PlayerGetOnObject : MonoBehaviour
         {
             transform.parent = null;
         }   
-        else if(col.gameObject.CompareTag(TagManager.MovableItem))
+        /*else if(col.gameObject.CompareTag(TagManager.MovableItem))
         {
             transform.parent = null;
-        }
+        }*/
         else if(col.gameObject.CompareTag(TagManager.Crusher))
         {
             transform.parent = null;

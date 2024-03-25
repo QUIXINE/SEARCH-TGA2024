@@ -11,8 +11,9 @@ public class DeliverLiftAdditionalFloor : MonoBehaviour
     [SerializeField] private float _moveToXPos;
     private Vector3 _startPosition;
     private Vector3 _endPosition;
-    private bool _isMovingL;
+    [FormerlySerializedAs("_isMovingL")] public bool IsMovingL;
     private bool _isAbleToMoveR;
+    [FormerlySerializedAs("_isCollidedWithCart")] public bool IsCollidedWithCart;
     [Tooltip("used to check time of deliver lift to make additional floor close when the lift is down")]
     [SerializeField] private DeliverLiftButton _deliverLiftButton;
 
@@ -28,17 +29,17 @@ public class DeliverLiftAdditionalFloor : MonoBehaviour
         bool isHit = Physics.Raycast(transform.position, Vector3.left, out hit, _raycastDistance);
         if(isHit && hit.collider.gameObject.CompareTag(TagManager.Lift))
         {
-            _isMovingL = true;
+            IsMovingL = true;
             _isAbleToMoveR = false;
         }
 
-        if (_isMovingL)
+        if (IsMovingL)
         {
             transform.localPosition = Vector3.MoveTowards(transform.localPosition, _endPosition, _openSpeed * Time.deltaTime);
             if (Vector3.Distance(transform.localPosition,  _endPosition) <= 0.01f && _deliverLiftButton.MoveNextTimeDecreased <= 0)
             {
                 _isAbleToMoveR = true;
-                _isMovingL = false;
+                IsMovingL = false;
             }
         }
         else if (_isAbleToMoveR)
@@ -49,8 +50,14 @@ public class DeliverLiftAdditionalFloor : MonoBehaviour
                 _isAbleToMoveR = false;
             }
         }
+        else if (IsCollidedWithCart && _deliverLiftButton.MoveNextTimeDecreased <= 0)
+        {
+            _isAbleToMoveR = true;
+            IsCollidedWithCart = false;
+        }
     }
     
+
     private void OnDrawGizmos() 
     {
         Gizmos.color = Color.blue;

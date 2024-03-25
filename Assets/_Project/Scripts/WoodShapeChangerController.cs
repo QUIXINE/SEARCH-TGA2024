@@ -51,7 +51,7 @@ public class WoodShapeChangerController : MonoBehaviour
         else if (col.gameObject.CompareTag(TagManager.Player)) //if player get inside shaper, player will get kill
         {
             PlayerTakeDamage playerTakeDamage = col.gameObject.GetComponent<PlayerTakeDamage>();
-            playerTakeDamage.TakeDamage();
+            playerTakeDamage.TakeDamage(gameObject.scene);
         }
     }
 }

@@ -8,7 +8,7 @@ public class FireDamage : MonoBehaviour
         {
             print("Collide");
             playerTakeDamage.gameObject.GetComponent<Rigidbody>().isKinematic = true;
-            playerTakeDamage.TakeDamage();
+            playerTakeDamage.TakeDamage(gameObject.scene);
         }
     }
 }

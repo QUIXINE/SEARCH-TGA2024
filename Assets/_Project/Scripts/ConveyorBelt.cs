@@ -10,12 +10,18 @@ public class ConveyorBelt : MonoBehaviour
     public bool IsMoving;
     [SerializeField] private List<GameObject> woods = new List<GameObject>();
     [FormerlySerializedAs("_moveSpeed")] [SerializeField] private float _woodMoveSpeed;
+     private int _woodAmount;
     
     [Header("Move Player")]
     [SerializeField] private float _playerMoveSpeed;
     private GameObject _player;
     private bool _isPlayerOn;
-    
+
+    private void Start()
+    {
+        _woodAmount = woods.Count;
+    }
+
     private void OnTriggerStay(Collider col)
     {
         if (col.gameObject.TryGetComponent<MovableObjectCheckMoving>(out var movableObj) &&
@@ -74,7 +80,6 @@ public class ConveyorBelt : MonoBehaviour
 
             if (IsMoving)
             {
-                print("IsMoving");
                 for (int i = 0; i < woods.Count; i++)
                 {
                     if (woods[i] != null)
@@ -91,7 +96,6 @@ public class ConveyorBelt : MonoBehaviour
         }
         else if (_isPlayerOn && IsMoving)
         {
-            print("Player Move");
             //Move player, gameObj local transform now is forward it's why I set position + transform.forward instead of transform.right
             //but if gameObj local transform is right, then set to transform.right
             _player.transform.position += transform.right * _playerMoveSpeed * Time.deltaTime;
@@ -103,40 +107,35 @@ public class ConveyorBelt : MonoBehaviour
         if (col.gameObject.TryGetComponent<MovableObjectCheckMoving>(out var movableObj) &&
             col.gameObject.CompareTag(TagManager.MovableItem))
         {
-            for (int i = 0; i <= woods.Count; i++)
+            //for loop always start with i = 0 because the loop happens when the colliders collide
+            for (int i = _woodAmount; i <= woods.Count; i++)
             {
                 if(i == 0)
                 {
-                    print("i = 0");
-
                     if (woods.Count == 0 && col.transform.parent && col.transform.parent.root.gameObject != _player)
                     {
-                        print("Assign Parent");
                         woods.Add(col.gameObject.transform.parent.gameObject);
                         woods[i].GetComponent<MovableObjectCheckMoving>().IsMoving = true;
                     }
                     else if (woods.Count == 0 && !col.transform.parent)
                     {
-                        print("Assign");
-                        //print("i == 0");
                         woods.Add(col.gameObject);
                         woods[i].GetComponent<MovableObjectCheckMoving>().IsMoving = true;
+                        _woodAmount++;
                     }
                 }
                 else if (i <= 10)
                 {
                     if (woods.Count > 0 && col.transform.parent && col.transform.parent.root.gameObject != _player && woods.All(l => l != col.transform.parent.gameObject))
                     {
-                        print("Assign Parent");
                         woods.Add(col.gameObject.transform.parent.gameObject);
                         woods[i].GetComponent<MovableObjectCheckMoving>().IsMoving = true;
                     }
                     else if (woods.Count > 0 && !col.transform.parent && woods.All(l => l != col.gameObject))
                     {
-                        //print("i != 0");
-                        print("Assign");
-                        woods.Add(col.gameObject.gameObject);
+                        woods.Add(col.gameObject);
                         woods[i].GetComponent<MovableObjectCheckMoving>().IsMoving = true;
+                        _woodAmount++;
                     }
                 }
             }

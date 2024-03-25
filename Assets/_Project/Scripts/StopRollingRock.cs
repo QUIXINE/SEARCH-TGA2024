@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class StopRollingRock : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class StopRollingRock : MonoBehaviour
     [SerializeField] private float _rollingAngle;
     [SerializeField] private float _rollSpeed;
     [SerializeField] private float _movePosition;
+    [SerializeField] private float _targetZAxisPos;
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _deceleratingSpeed;
     [SerializeField] private float _decreaseSpeedNextTime;
@@ -37,8 +39,10 @@ public class StopRollingRock : MonoBehaviour
                 _moveSpeed -= _deceleratingSpeed;
                 _decreaseSpeedNextTime += _deSpeedNextTimeDuration;
             }
-            if (transform.position.z >= 1.5 || _moveSpeed <= 0)
+            if (transform.position.z >= _targetZAxisPos || _moveSpeed <= 0)
             {
+                _rb.constraints = RigidbodyConstraints.FreezeRotationX
+                                  | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
                 _isCollidedWithRockStop = false;
             }
         }
@@ -50,7 +54,8 @@ public class StopRollingRock : MonoBehaviour
         {
             print(("Collide"));
             _rb.velocity = Vector3.zero;
-            _rb.constraints = RigidbodyConstraints.FreezeAll & ~RigidbodyConstraints.FreezePositionZ & ~RigidbodyConstraints.FreezeRotationX;
+            _rb.constraints = RigidbodyConstraints.FreezeAll & ~RigidbodyConstraints.FreezePositionZ & ~RigidbodyConstraints.FreezeRotationX
+                              & ~RigidbodyConstraints.FreezeRotationY & ~RigidbodyConstraints.FreezeRotationZ;
             _isCollidedWithRockStop = true;
         }
     }

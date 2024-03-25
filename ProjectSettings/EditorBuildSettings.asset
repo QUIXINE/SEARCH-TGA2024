@@ -4,5 +4,44 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/_Project/Scenes/PlayerForest.unity
+    guid: 7bae33c3ca9337847a6997d840a62abe
+  - enabled: 1
+    path: Assets/_Project/Scenes/PlayerClownHouse.unity
+    guid: 56026f4641a443b4f87294837bcd68f7
+  - enabled: 1
+    path: Assets/_Project/Scenes/Forest/ForestMech1.unity
+    guid: 44942417c6fad8547acb3b001af85d08
+  - enabled: 1
+    path: Assets/_Project/Scenes/Forest/ForestMech4.unity
+    guid: 48ca766c7fc500f4bb92ec8af84e5de3
+  - enabled: 1
+    path: Assets/_Project/Scenes/Forest/ForestMech5.unity
+    guid: 1ec45915bf38fc846aceb8a34e7375cb
+  - enabled: 1
+    path: Assets/_Project/Scenes/Forest/ForestMech6.unity
+    guid: 5c09f2d49a9354741acc10a6b0339aa9
+  - enabled: 1
+    path: Assets/_Project/Scenes/Forest/ForestMech7.unity
+    guid: 6981e0bb58b1c9b43aad39529119dca3
+  - enabled: 1
+    path: Assets/_Project/Scenes/Forest/ForestMech8.unity
+    guid: 831d6dfbb7e7c5646a95327c3a65f9f1
+  - enabled: 1
+    path: Assets/_Project/Scenes/Clown House/ClownHMech1.unity
+    guid: 07459e9e8b8832543904238ee3f538ce
+  - enabled: 1
+    path: Assets/_Project/Scenes/Clown House/ClownHMech2.unity
+    guid: 6789675dab32f0b45a4631eaab9ccd41
+  - enabled: 1
+    path: Assets/_Project/Scenes/Clown House/ClownHMech3.unity
+    guid: 45f539693a30ce54a90647c30477742c
+  - enabled: 1
+    path: Assets/_Project/Scenes/Clown House/ClownHMech6.unity
+    guid: e8281724ffb33334b8390f8fcf4c2f0c
+  - enabled: 1
+    path: Assets/_Project/Scenes/Clown House/ClownHMech7.unity
+    guid: 4f394d5ee4083fb479b3de7bb635d6f1
   m_configObjects: {}

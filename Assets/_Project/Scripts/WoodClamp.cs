@@ -10,8 +10,9 @@ public class WoodClamp : MonoBehaviour
     [Tooltip("close fire pit after Wait To Move Left Time reach to this")]
     [SerializeField] private float _timeToCloseFirePit;
     
+    [FormerlySerializedAs("_target")]
     [Header("Animation Rigging Effector")]
-    [SerializeField] private Transform _target;
+    [SerializeField] private Transform _effector;
     
     [Header("Effector Position Setting")]
     [SerializeField] private Vector3 _targetStartPosition;
@@ -20,9 +21,15 @@ public class WoodClamp : MonoBehaviour
     [Header("Clamp Position Setting")]
     private Vector3 _clampStartPosition;
     private Vector3 _clampGetUpPosition;
-    [Tooltip("Clamp Get Up Position For Player will move lower than Clamp Get Up Position")]
-    private Vector3 _clampGetUpPositionForPlayer;
+    [FormerlySerializedAs("_clampYPosToGetUp")]
+    [Tooltip("plus this y pos to root's transform position to get up")]
+    [SerializeField] private float _yPosToGetUp;
+    private Vector3 _clampGetUpPositionForPlayer;   //Clamp Get Up Position For Player will move lower than Clamp Get Up Position
+    [Tooltip("In case of player is grabbed, plus this y pos to root's transform position to get up")]
+    [SerializeField] private float _yPosToGetUpIfGrabPlayer;
     private Vector3 _clampGetRightPosition;
+    [Tooltip("In case of player is grabbed, plus this y pos to root's transform position to get to the right pos")]
+    [SerializeField] private float _xPosToGetRight;
     [Tooltip("Clamp moving speed")]
     [SerializeField] private float _maxDistanceDelta;
     [Tooltip("Clamp grabbing speed when found player")]
@@ -35,22 +42,22 @@ public class WoodClamp : MonoBehaviour
     private bool _isPlayerGrabbed;
     private bool _isWoodGrabbed;
     private bool _isMove;
-    private bool _isUp;
-    private bool _isDown;
-    private bool _isRight;
-    private bool _isLeft;
+    private bool _isGoingUp;
+    private bool _isGoingDown;
+    private bool _isGoingRight;
+    private bool _isGoingLeft;
 
     private GameObject _grabbedObj;
     // Start is called before the first frame update
     void Start()
     {
-        _targetStartPosition = _target.transform.localPosition;
-        _targetStraightPosition = new Vector3(_target.transform.localPosition.x - 0.2f,
-            _target.transform.localPosition.y + 0.005f, _target.transform.localPosition.z);
+        _targetStartPosition = _effector.transform.localPosition;
+        _targetStraightPosition = new Vector3(_effector.transform.localPosition.x - 0.2f,
+            _effector.transform.localPosition.y + 0.005f, _effector.transform.localPosition.z);
         _clampStartPosition = transform.root.position;
-        _clampGetUpPosition = new Vector3(transform.root.position.x, transform.root.position.y + 6, transform.root.position.z);
-        _clampGetUpPositionForPlayer = new Vector3(transform.root.position.x, transform.root.position.y + 1, transform.root.position.z);
-        _clampGetRightPosition = new Vector3(transform.root.position.x + 8, _clampGetUpPositionForPlayer.y, transform.root.position.z);
+        _clampGetUpPosition = new Vector3(transform.root.position.x, transform.root.position.y + _yPosToGetUp, transform.root.position.z);
+        _clampGetUpPositionForPlayer = new Vector3(transform.root.position.x, transform.root.position.y + _yPosToGetUpIfGrabPlayer, transform.root.position.z);
+        _clampGetRightPosition = new Vector3(transform.root.position.x + _xPosToGetRight, _clampGetUpPositionForPlayer.y, transform.root.position.z);
         _waitToMoveDownTimeDecreased = _waitToMoveDownTime;
         _waitToMoveLeftTimeDecreased = _waitToMoveLeftTime;
     }
@@ -75,7 +82,7 @@ public class WoodClamp : MonoBehaviour
                 _isPlayerGrabbed = false;
                 _isWoodGrabbed = true;
                 _isAbleToGrab = false;
-                if (!_isDown)
+                if (!_isGoingDown)
                 {
                     _isMove = true;
                 }
@@ -88,10 +95,12 @@ public class WoodClamp : MonoBehaviour
             {
                 _grabbedObj = hitInfo.collider.gameObject;
                 _isWoodGrabbed = false;
+                _grabbedObj.GetComponent<Animator>().SetBool("IsWalking", false);
+                _grabbedObj.GetComponent<PlayerController>().HorizontalInput = 0;
                 _grabbedObj.GetComponent<PlayerController>().enabled = false;
                 _isPlayerGrabbed = true;
                 _isAbleToGrab = false;
-                if (!_isLeft)
+                if (!_isGoingLeft)
                 {
                     _isMove = true;
                 }
@@ -109,28 +118,28 @@ public class WoodClamp : MonoBehaviour
         }
         if (_isWoodGrabbed)
         {
-            if (_isUp)
+            if (_isGoingUp)
             {
                 MoveUp();
             }
-            else if (_isDown)
+            else if (_isGoingDown)
             {
                 MoveDown();
             }
         }
         else if (_isPlayerGrabbed)
         {
-            if (_isUp)
+            if (_isGoingUp)
             {
                 transform.root.position = Vector3.MoveTowards(transform.root.position, _clampGetUpPositionForPlayer, _maxDistanceDelta * Time.deltaTime);
-                _target.localPosition = Vector3.MoveTowards(_target.localPosition, _targetStraightPosition, _maxDistanceDelta * Time.deltaTime);
+                _effector.localPosition = Vector3.MoveTowards(_effector.localPosition, _targetStraightPosition, _maxDistanceDelta * Time.deltaTime);
                 if (Vector3.Distance(transform.root.position, _clampGetUpPositionForPlayer) <= 0.01f)
                 {
-                    _isRight = true;
-                    _isUp = false;
+                    _isGoingRight = true;
+                    _isGoingUp = false;
                 }
             }
-            else if (_isRight)
+            else if (_isGoingRight)
             {
                 //Open the fire pit
                 _firePitOpenClose[0].IsPlayerClamped = true;
@@ -147,13 +156,13 @@ public class WoodClamp : MonoBehaviour
                     if (_waitToMoveDownTime <= 0)
                     {
                         //is down = true, is up = false
-                        _isLeft = true;
-                        _isRight = false;
+                        _isGoingLeft = true;
+                        _isGoingRight = false;
                         _waitToMoveDownTimeDecreased = _waitToMoveDownTime;
                     }
                 }
             }
-            else if (_isLeft)
+            else if (_isGoingLeft)
             {
                 _waitToMoveLeftTimeDecreased -= Time.deltaTime;
                 if (_waitToMoveLeftTimeDecreased <= _timeToCloseFirePit && _waitToMoveLeftTimeDecreased > 0)
@@ -175,7 +184,7 @@ public class WoodClamp : MonoBehaviour
                         {
                             _waitToMoveLeftTimeDecreased = _waitToMoveLeftTime;
                             _isAbleToGrab = true;
-                            _isLeft = false;
+                            _isGoingLeft = false;
                             _isPlayerGrabbed = false;
                         }
                     }
@@ -190,12 +199,12 @@ public class WoodClamp : MonoBehaviour
         transform.root.position = Vector3.MoveTowards(transform.root.position, _clampStartPosition, _maxDistanceDelta * Time.deltaTime);
         if (Vector3.Distance(transform.root.position, _clampStartPosition) <= 0.01f)
         {
-            _target.localPosition = Vector3.MoveTowards(_target.localPosition, _targetStartPosition, _maxDistanceDelta * Time.deltaTime);
-            if (Vector3.Distance(_target.localPosition, _targetStartPosition) <= 0.01f)
+            _effector.localPosition = Vector3.MoveTowards(_effector.localPosition, _targetStartPosition, _maxDistanceDelta * Time.deltaTime);
+            if (Vector3.Distance(_effector.localPosition, _targetStartPosition) <= 0.01f)
             {
                 _isWoodGrabbed = false;
                 _isAbleToGrab = true;
-                _isDown = false;
+                _isGoingDown = false;
             }
         }
     }
@@ -203,7 +212,7 @@ public class WoodClamp : MonoBehaviour
     private void MoveUp()
     {
         transform.root.position = Vector3.MoveTowards(transform.root.position, _clampGetUpPosition, _maxDistanceDelta * Time.deltaTime);
-        _target.localPosition = Vector3.MoveTowards(_target.localPosition, _targetStraightPosition, _maxDistanceDelta * Time.deltaTime);
+        _effector.localPosition = Vector3.MoveTowards(_effector.localPosition, _targetStraightPosition, _maxDistanceDelta * Time.deltaTime);
         if (Vector3.Distance(transform.root.position, _clampGetUpPosition) <= 0.01f)
         {
             _grabbedObj.GetComponent<WoodPooled>().IsWoodReadyToGetBack = true;
@@ -212,8 +221,8 @@ public class WoodClamp : MonoBehaviour
             if (_waitToMoveDownTimeDecreased <= 0)
             {
                 //is down = true, is up = false
-                _isDown = true;
-                _isUp = false;
+                _isGoingDown = true;
+                _isGoingUp = false;
                 _waitToMoveDownTimeDecreased = _waitToMoveDownTime;
             }
         }
@@ -221,25 +230,19 @@ public class WoodClamp : MonoBehaviour
 
     private void MoveEffector()
     {
-        _target.position =
-            Vector3.MoveTowards(_target.position, _grabbedObj.transform.position, _grabSpeed * Time.deltaTime);
+        _effector.position =
+            Vector3.MoveTowards(_effector.position, _grabbedObj.transform.position, _grabSpeed * Time.deltaTime);
         //Check distance to go up, to get to straight pose 
-        if (Vector3.Distance(_target.position, _grabbedObj.transform.position) <= 0.1f)
+        if (Vector3.Distance(_effector.position, _grabbedObj.transform.position) <= 0.1f)
         {
             //up, pose
             _grabbedObj.GetComponent<Rigidbody>().isKinematic = true;
             _grabbedObj.GetComponent<Rigidbody>().useGravity = false;
             _grabbedObj.transform.parent = transform;
-            _isUp = true;
+            _isGoingUp = true;
             _isMove = false;
         }
     }
-
-    private void IsObjInInnerCircle()
-    {
-        
-    }
-    
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;

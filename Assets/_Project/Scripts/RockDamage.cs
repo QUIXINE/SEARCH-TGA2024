@@ -10,7 +10,7 @@ public class RockDamage : MonoBehaviour
     {
         if (col.gameObject.TryGetComponent<PlayerTakeDamage>(out PlayerTakeDamage playerTakeDamage) && !IsPlayerInSafeSpot)
         {
-            playerTakeDamage.TakeDamage();
+            playerTakeDamage.TakeDamage(gameObject.scene);
         }
     }
 }

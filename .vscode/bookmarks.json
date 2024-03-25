@@ -1,0 +1,29 @@
+{
+	"files": [
+		{
+			"path": "Assets/_Project/Scripts/WoodCutter.cs",
+			"bookmarks": [
+				{
+					"line": 9,
+					"column": 35,
+					"label": ""
+				},
+				{
+					"line": 14,
+					"column": 35,
+					"label": ""
+				}
+			]
+		},
+		{
+			"path": "Assets/_Project/Scripts/Water.cs",
+			"bookmarks": [
+				{
+					"line": 10,
+					"column": 0,
+					"label": ""
+				}
+			]
+		}
+	]
+}

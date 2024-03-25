@@ -17,7 +17,7 @@ public class BearTrapDamage : MonoBehaviour
         if (col.TryGetComponent<PlayerTakeDamage>(out PlayerTakeDamage playerTakeDamage))
         {
             _animator.SetBool(("IsClose"), true);
-            playerTakeDamage.TakeDamage();
+            playerTakeDamage.TakeDamage(gameObject.scene);
         }
     }
 }
