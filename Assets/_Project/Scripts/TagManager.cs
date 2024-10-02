@@ -10,4 +10,9 @@ public static class TagManager
     public static readonly string Branch = "Branch";
     public static readonly string MovableItem = "MovableItem";
     public static readonly string Player = "Player";
+    public static readonly string Woods = "Woods";
+    public static readonly string Crusher = "Crusher";
+    public static readonly string RespawnPoint = "RespawnPoint";
+    public static readonly string Ledge = "Ledge";
+    public static readonly string Ladder = "Ladder";
 }

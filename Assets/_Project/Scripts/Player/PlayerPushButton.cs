@@ -7,7 +7,7 @@ public class PlayerPushButton : MonoBehaviour
 
     private void Update() 
     {
-        if(_button != null && _isReadyToPush && Input.GetKeyDown(KeyCode.RightControl))
+        if(_button != null && _isReadyToPush && Input.GetKeyDown(KeyCode.LeftControl))
         {
             _button.Execute();
         }    

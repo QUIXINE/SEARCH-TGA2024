@@ -1,0 +1,6 @@
+{"LevelData":
+    [{"SpawnPointX":0,
+    "SpawnPointY":0,
+    "SpawnPointZ":0,
+    "PlayerSceneName":"",
+    "CurrentScene":""}]}

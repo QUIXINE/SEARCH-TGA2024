@@ -6,10 +6,14 @@ TagManager:
   tags:
   - FerrisStopDestination
   - Button
-  - PlayerEyes
   - Lift
   - Branch
   - MovableItem
+  - Woods
+  - Crusher
+  - RespawnPoint
+  - Ledge
+  - PlayerEyes
   layers:
   - Default
   - TransparentFX
@@ -19,9 +23,9 @@ TagManager:
   - UI
   - Ground
   - Doll
-  - 
-  - 
-  - 
+  - Player
+  - MovableObj
+  - Obstacle
   - 
   - 
   - 
