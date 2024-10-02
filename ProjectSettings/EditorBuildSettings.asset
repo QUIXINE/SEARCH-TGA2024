@@ -15,8 +15,11 @@ EditorBuildSettings:
     path: Assets/_Project/Scenes/Forest/ForestMech1.unity
     guid: 44942417c6fad8547acb3b001af85d08
   - enabled: 1
-    path: Assets/_Project/Scenes/Forest/ForestMech4.unity
+    path: Assets/_Project/Scenes/Forest/ForestMech3.unity
     guid: 48ca766c7fc500f4bb92ec8af84e5de3
+  - enabled: 1
+    path: Assets/_Project/Scenes/Forest/ForestMech4.unity
+    guid: bef28823d9442954fa022bc68a65f5e9
   - enabled: 1
     path: Assets/_Project/Scenes/Forest/ForestMech5.unity
     guid: 1ec45915bf38fc846aceb8a34e7375cb

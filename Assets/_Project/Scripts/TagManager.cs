@@ -14,4 +14,5 @@ public static class TagManager
     public static readonly string Crusher = "Crusher";
     public static readonly string RespawnPoint = "RespawnPoint";
     public static readonly string Ledge = "Ledge";
+    public static readonly string Ladder = "Ladder";
 }
